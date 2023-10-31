@@ -27,7 +27,7 @@ class AuthorController extends AbstractController
      */
     public function show(AuthorRepository $repo):Response
     {
-        $result=$repo->findAll();
+        $result=$repo->listAuthorByEmail();
         return $this->render('author/showAuthor.html.twig',[
             'res'=>$result
         ]);

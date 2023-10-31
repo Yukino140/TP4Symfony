@@ -7,6 +7,8 @@ use App\Entity\Book;
 use App\Form\BookType;
 use App\Repository\AuthorRepository;
 use App\Repository\BookRepository;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,9 +52,22 @@ class BookController extends AbstractController
     /**
      * @Route("/listeBooks",name="lsBooks")
      */
-    public function list(BookRepository $repo):Response
+    public function list(BookRepository $repo,EntityManagerInterface $em):Response
     {
-        $result=$repo->findAll();
+        $result = $repo->createQueryBuilder('b')
+                    ->join('b.author', 'a')
+                    ->where('b.publicationDate < :year')
+                    ->andWhere('a.nb_books > 10')
+                    ->setParameter('year', '2023-01-01')
+                    ->getQuery()
+                    ->getResult();
+        $books = $repo->findBy(['category' => 'Science-Fiction']);
+
+        foreach ($books as $book) {
+            $book->setCategory('Romance');
+        }
+        
+        $em->flush();
         $n=0;
         $m=0;
         for($i=1;$i<=sizeof($result);$i++){
@@ -109,4 +124,15 @@ class BookController extends AbstractController
             "res"=>$result
         ]);
     }
+
+    /**
+     * @Route("nbLivre",name="affnblivre")
+     */
+    public function aff(EntityManagerInterface $em):Response
+    {
+                $count = $em->createQuery(' SELECT COUNT(b) FROM App\Entity\Book b WHERE b.category = :category')
+                ->setParameter('category', 'Romance');
+                dd($count);
+    }
+
 }
