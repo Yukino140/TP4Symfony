@@ -1,0 +1,51 @@
+{% if rs is empty %}
+       <h1>No Books Found</h1>
+ {% else %} 
+<table style="border:1px solid black">
+    <tr style="border:1px solid black">
+        <th>Title</th>
+        <th>Publication Date</th>
+        <th>Published</th>
+        <th>Category</th>
+        <th>Author</th> 
+        <th>Action</th>
+    </tr>
+    {% for item in rs %}
+      
+    
+        {% if item.published %}
+            
+        
+        <tr style="border:1px solid black">
+            <td>
+
+                {{item.title}}
+            </td>
+            <td>
+                {{item.publicationDate|date('d/m/y')}}
+            </td>
+            <td>
+               {{item.published}}
+            </td>
+            <td>
+               {{item.category}}
+            </td>
+            <td>
+               {{item.author}}
+            </td>
+            <td>
+            <a href="{{path('UpdateBook',{'id':item.id})}}">edit</a>
+            <a href="{{path('rmvBook',{'id':item.id})}}">delete</a>
+            <a href="{{path('shdt',{'id':item.id})}}">show</a>
+
+            </td>
+        </tr>
+        {% endif %}
+    {% endfor %}
+    
+</table>
+        {% endif %}
+
+<p>Number of published Books: {{nb_p}}</p>
+<p>Number of unpublished Books: {{nb_np}}</p>
+<button><a href="{{path('AddBook')}}">Create new</a></button>
